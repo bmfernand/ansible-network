@@ -1,0 +1,11 @@
+[PE]
+192.168.36.10.eve.local
+192.168.36.11.eve.local
+
+[P]
+192.168.36.12.eve.local
+
+[ios-devices]
+192.168.36.10.eve.local
+192.168.36.11.eve.local
+192.168.36.12.eve.local
