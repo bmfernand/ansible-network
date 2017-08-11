@@ -1,0 +1,24 @@
+---
+- name: play02.yaml
+  hosts: "ios-devices"
+  gather_facts: false
+  connection: local
+
+  vars:
+    cli:
+      host: "{{ inventory_hostname}}"
+      username: "{{ ansible_ssh_user }}"
+      password: "{{ ansible_ssh_password }}"
+      transport: cli
+
+  tasks:
+    - name: backup_confis 
+      ios_config:
+        backup: yes
+        provider: "{{ cli }}"
+
+      register: output
+
+    - name: show output
+      debug:
+        var: output.stdout

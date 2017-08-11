@@ -1,0 +1,26 @@
+---
+- name: play03.yaml
+  hosts: "P"
+  gather_facts: false
+  connection: local
+
+  vars:
+    cli:
+      host: "{{ inventory_hostname}}"
+      username: "{{ ansible_ssh_user }}"
+      password: "{{ ansible_ssh_password }}"
+      transport: cli
+
+  tasks:
+    - name: BF 
+      ios_command:
+        commands:
+          - show run
+        provider: "{{ cli }}"
+
+      register: output
+
+    - name: save
+      copy:
+        content: "{{ output.stdout[0] }}"
+        dest: "./backup/show_run_{{ inventory_hostname }}.txt" 

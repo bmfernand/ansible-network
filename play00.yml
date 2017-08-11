@@ -1,0 +1,45 @@
+---
+- name: play00.yaml
+  hosts: "ios-devices"
+  gather_facts: false
+  connection: local
+
+  vars:
+    cli:
+      host: "{{ inventory_hostname}}"
+      username: "{{ ansible_ssh_user }}"
+      password: "{{ ansible_ssh_password }}"
+      transport: cli
+
+  tasks:
+    - name: show version
+      ios_command:
+        commands: show version
+        provider: "{{ cli }}"
+      
+      register: output
+
+    - name: show output
+      debug:
+        var: output.stdout
+
+    - name: teste2 
+      debug:
+        msg: "{{ inventory_hostname }}" 
+
+    - name: copy output to file
+      copy: content="{{ output }}" dest=./output/{{ inventory_hostname }}.txt 
+
+    - name: show ip interface
+      ios_command:
+        commands:
+          - show vrf
+          - show ip interface brief
+          - wr
+        provider: "{{ cli }}"
+
+      register: output
+
+    - name: show output
+      debug:
+        var: output.stdout

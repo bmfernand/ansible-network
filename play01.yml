@@ -1,0 +1,25 @@
+---
+- name: show version
+  hosts: "ios-devices"
+  gather_facts: false
+  connection: local
+
+  vars:
+    cli:
+      host: "{{ inventory_hostname}}"
+      username: "{{ ansible_ssh_user }}"
+      password: "{{ ansible_ssh_password }}"
+      transport: cli
+
+  tasks:
+    - name: show version
+      ios_command:
+        commands: show version
+        provider: "{{ cli }}"
+      
+      register: output
+
+    - name: show output
+      debug:
+        var: output.stdout
+
