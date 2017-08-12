@@ -12,15 +12,18 @@
       transport: cli
 
   tasks:
+    - name: timestamp_gatter
+      local_action: command date "+%Y-%m-%d-%H:%M:%S"
+      register: timestamp
+
     - name: BF 
       ios_command:
         commands:
           - show run
         provider: "{{ cli }}"
-
       register: output
 
     - name: save
       copy:
         content: "{{ output.stdout[0] }}"
-        dest: "./backup/show_run_{{ inventory_hostname }}.txt" 
+        dest: "./backup/{{ inventory_hostname }}_{{ timestamp.stdout[0] }}" 
