@@ -1,0 +1,48 @@
+---
+- name: play03.yaml
+  hosts: "ios-devices"
+  gather_facts: false
+  connection: local
+
+  vars:
+    backup_root: ./backup
+
+    cli:
+      host: "{{ inventory_hostname}}"
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_ssh_pass }}"
+      transport: cli
+
+  tasks:
+    - name: timestamp_gatter
+      local_action: command date "+%Y-%m-%d-%H:%M:%S"
+      register: timestamp
+
+    - name: ensure backup folder is created
+      file:
+        path: "{{ backup_root }}"
+        state: directory
+
+      run_once: yes
+
+    - name: ensure device folder is created
+      file:
+        path: "{{ backup_root }}/{{ inventory_hostname }}"
+        state: directory
+
+    - name: show running-config 
+      ios_command:
+        commands:
+          - show run
+        provider: "{{ cli }}"
+      register: config
+
+    - name: backup the config....Old Style
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "{{ backup_root }}/{{ inventory_hostname }}/config_{{ timestamp.stdout }}" 
+
+#    - name: backup the config....Git Style
+#      ios_config:
+#        backup: yes
+#        provider: "{{ cli }}"
