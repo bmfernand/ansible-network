@@ -6,6 +6,7 @@
 
   vars:
     backup_root: ./backup
+    backup_root_teste: ./backup-teste
 
     cli:
       host: "{{ inventory_hostname}}"
