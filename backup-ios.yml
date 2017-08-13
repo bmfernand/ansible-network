@@ -1,5 +1,5 @@
 ---
-- name: play03.yaml
+- name: backup-ios.yaml
   hosts: "ios-devices"
   gather_facts: false
   connection: local
@@ -14,6 +14,14 @@
       transport: cli
 
   tasks:
+
+    - name: Get the current config
+      ios_command:
+        commands:
+          - show running-config
+        provider: "{{ cli }}"
+      register: config
+
     - name: timestamp_gatter
       local_action: command date "+%Y-%m-%d-%H:%M:%S"
       register: timestamp
@@ -22,7 +30,6 @@
       file:
         path: "{{ backup_root }}"
         state: directory
-
       run_once: yes
 
     - name: ensure device folder is created
@@ -30,20 +37,12 @@
         path: "{{ backup_root }}/{{ inventory_hostname }}"
         state: directory
 
-    - name: show running-config 
-      ios_command:
-        commands:
-          - show run
-        provider: "{{ cli }}"
-      register: config
-
     - name: backup the config....Old Style
       copy:
         content: "{{ config.stdout[0] }}"
-        #dest: "{{ backup_root }}/{{ inventory_hostname }}/config_{{ timestamp.stdout }}"
-        dest: "{{ backup_root }}/{{ inventory_hostname }}/config"
+        dest: "{{ backup_root }}/{{ inventory_hostname }}/config_{{ timestamp.stdout }}"
 
-#    - name: backup the config....Git Style
-#      ios_config:
-#        save: yes
-#        provider: "{{ cli }}"
+    - name: backup the config....GIT Style
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "{{ backup_root }}/{{ inventory_hostname }}/config.cfg"     
