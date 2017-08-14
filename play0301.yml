@@ -33,7 +33,7 @@
     - name: show running-config 
       ios_command:
         commands:
-          - show run
+          - show running-config
         provider: "{{ cli }}"
       register: config
 
