@@ -1,0 +1,49 @@
+---
+- name: backup-ios.yaml
+  hosts: "ios-devices"
+  gather_facts: false
+  connection: local
+
+  vars:
+    backup_root: ./backup
+    backup_root_teste: ./backup-teste
+
+    cli:
+      host: "{{ inventory_hostname}}"
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_ssh_pass }}"
+      transport: cli
+
+  tasks:
+
+    - name: Get the current config
+      ios_command:
+        commands:
+          - show running-config
+        provider: "{{ cli }}"
+      register: config
+
+    - name: timestamp_gatter
+      local_action: command date "+%Y-%m-%d-%H:%M:%S"
+      register: timestamp
+
+    - name: ensure backup folder is created
+      file:
+        path: "{{ backup_root }}"
+        state: directory
+      run_once: yes
+
+    - name: ensure device folder is created
+      file:
+        path: "{{ backup_root }}/{{ inventory_hostname }}"
+        state: directory
+
+    - name: backup the config....Old Style
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "{{ backup_root }}/{{ inventory_hostname }}/config_{{ timestamp.stdout }}"
+
+    - name: backup the config....GIT Style
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "{{ backup_root }}/{{ inventory_hostname }}/config.cfg"     
