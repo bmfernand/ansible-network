@@ -1,0 +1,34 @@
+---
+- name: testing
+  hosts: "P"
+  gather_facts: false
+  connection: local
+  
+  vars:
+    ftp_host: 192.168.36.1
+    backup_root: "tmp/ansible/backup"
+    cli:
+      host: "{{ inventory_hostname}}"
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_ssh_pass }}"
+      transport: cli
+
+  tasks:
+
+    - name: Lets get the initial config 
+      ios_command:
+        commands: 
+         # - "erase startup-config"
+          - "copy ftp://bruno:epiccarbon@{{ ftp_host }}/{{ backup_root }}/{{ inventory_hostname }}/basic.j2 startup-config"
+          #- "copy startup-config running-config"
+        #waitfor:
+        #  - "result[0] contains confirm"
+        provider: "{{ cli }}"
+
+  #  - name: testing with jinja2 templates
+  #    ios_config:
+  #      #config: "{{  config.stdout[0] }}"
+  #      src: config.j2
+  #      provider: "{{ cli }}"
+  #      #register: output
+
